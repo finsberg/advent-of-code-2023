@@ -7,17 +7,41 @@ from pathlib import Path
 
 here = Path(__file__).absolute().parent
 
+numbers = dict(
+    zip(
+        [
+            "one",
+            "two",
+            "three",
+            "four",
+            "five",
+            "six",
+            "seven",
+            "eight",
+            "nine",
+        ],
+        map(str, range(1, 10)),
+    )
+)
+numbers.update(dict(zip(map(str, range(1, 10)), map(str, range(1, 10)))))
 
-def calibration_value_from_line(line: str) -> int:
-    line = line.strip()
 
+def digitlist2number(digits: list[str]) -> int:
     try:
-        first = next(s for s in line if s.isdigit())
-        last = next(s for s in reversed(line) if s.isdigit())
-    except StopIteration:
+        return int(digits[0] + digits[-1])
+    except IndexError:
         return 0
 
-    return int(first + last)
+
+def line2digits(line):
+    for i in range(len(line)):
+        for word, digit in numbers.items():
+            if line.startswith(word, i):
+                yield digit
+
+
+def calibration_value_from_line(line):
+    return digitlist2number(list(line2digits(line)))
 
 
 def run(text: str) -> int:
@@ -51,7 +75,7 @@ if __name__ == "__main__":
 else:
     import pytest
 
-    def test_main():
+    def test_run_part1():
         test_input = dedent(
             """
         1abc2
@@ -72,5 +96,37 @@ else:
             ("treb7uchet", 77),
         ),
     )
-    def test_calibration_value_from_line(line, expected_value):
+    def test_calibration_value_from_line_part1(line, expected_value):
+        assert calibration_value_from_line(line) == expected_value
+
+    def test_run_part2():
+        test_input = dedent(
+            """
+        two1nine
+        eightwothree
+        abcone2threexyz
+        xtwone3four
+        4nineeightseven2
+        zoneight234
+        7pqrstsixteen
+        """
+        )
+        value = run(test_input)
+        assert value == 281
+
+    @pytest.mark.parametrize(
+        "line, expected_value",
+        (
+            ("two1nine", 29),
+            ("eightwothree", 83),
+            ("abcone2threexyz", 13),
+            ("xtwone3four", 24),
+            ("4nineeightseven2", 42),
+            ("zoneight234", 14),
+            ("7pqrstsixteen", 76),
+            ("eightwo", 82),
+            ("eighttwo", 82),
+        ),
+    )
+    def test_calibration_value_from_line_part2(line, expected_value):
         assert calibration_value_from_line(line) == expected_value
