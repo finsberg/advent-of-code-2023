@@ -15,8 +15,8 @@ def game_points(game: str) -> int:
     game_no, game_ = game.strip().split(":")
 
     winning_str, your_str = game_.split("|")
-    your = set(your_str.split(" ")) - set(("",))
-    winning = set(winning_str.strip().split(" ")) - set(("",))
+    your = set(your_str.split())
+    winning = set(winning_str.strip().split())
 
     num_winning_numbers = len(your & winning)
     if num_winning_numbers == 0:
